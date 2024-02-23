@@ -1,0 +1,632 @@
+---
+title: "Gandaki province ERA5 hourly data"
+author: "Shirish Maharjan"
+date: "2023-10-17"
+output: html_document
+---
+
+# List all the municaplities in gandaki pradesh [Step 1] [DONE]
+# Calculate climate extremes of that municipalities [Step 2] [DONE]
+# Calculate slope and p value of that municpalitie [Step 3]
+
+# Load libraries 
+```{r}
+library(dplyr)
+library(readxl)
+```
+
+
+# Step 1: List all the municaplities in gandaki pradesh [Step 1]
+```{r}
+grid_palika_join <- read_excel("E:/GIIS/ERA5 Hourly Data/Data/Grid_Palika_Join(Third)/Gird_Palika_join.xlsx")
+
+gandaki_pradesh <- grid_palika_join %>% 
+  select(Province, GaPa_NaPa) %>% 
+  filter(Province == "Gandaki")
+
+gandaki_pradesh <- unique(gandaki_pradesh$GaPa_NaPa)
+
+class(gandaki_pradesh) 
+
+gandaki_pradesh <- as.data.frame(gandaki_pradesh)
+
+write.csv(gandaki_pradesh, "E:/GIIS/ERA5 Hourly Data/Gandaki province/Data/Municipality list (first)/municipality_list.csv")
+
+```
+
+# Load tempMax data 
+```{r}
+tempMax_1950_2022_municipality <- read.csv("E:/GIIS/ERA5 Hourly Data/Data/Average_grid_data (Fourth)/Municipality/tempMax_1950_2022_municipality.csv")
+
+tempMin_1950_2022_municipality <- read.csv("E:/GIIS/ERA5 Hourly Data/Data/Average_grid_data (Fourth)/Municipality/tempMin_1950_2022_municipality.csv")
+
+precTot_1950_2022_municipality <-  read.csv("E:/GIIS/ERA5 Hourly Data/Data/Average_grid_data (Fourth)/Municipality/precTot_1950_2022_municipality.csv")
+
+```
+
+# Select Gandaki pradesh municipalty only 
+```{r}
+tempMax_1950_2022_gandaki_municipality <- tempMax_1950_2022_municipality %>% 
+  select(year, month, day,
+Besishahar,
+Dordi,
+Dudhpokhari,
+Kwholasothar,
+MadhyaNepal,
+Marsyangdi,
+Rainas,
+Sundarbazar,
+Anbukhaireni,
+Bandipur,
+Bhanu,
+Bhimad,
+Byas,
+Devghat,
+Ghiring,
+Myagde,
+Rhishing,
+Shuklagandaki,
+Aandhikhola,
+Arjunchaupari,
+Bhirkot,
+Biruwa,
+Chapakot,
+Galyang,
+Harinas,
+Kaligandagi,
+Phedikhola,
+Putalibazar,
+Waling,
+Annapurna,
+Machhapuchchhre,
+Madi,
+Pokhara.Lekhnath,
+Rupa,
+Chame,
+Narphu,
+Nashong,
+Neshyang,
+Barhagaun.Muktikhsetra,
+Dalome,
+Gharapjhong,
+Lomanthang,
+Thasang,
+Beni,
+Dhaulagiri,
+Malika,
+Mangala,
+Raghuganga,
+Dhorpatan.Hunting.Reserve,
+Bihadi,
+Jaljala,
+Kushma,
+Mahashila,
+Modi,
+Painyu,
+Phalebas,
+Badigad,
+Baglung,
+Bareng,
+Dhorpatan,
+Galkot,
+Jaimuni,
+Kanthekhola,
+Nisikhola,
+Taman.Khola,
+Tara.Khola,
+Aarughat,
+Ajirkot,
+Bhimsen,
+Chum.Nubri,
+Dharche,
+Gandaki,
+Gorkha,
+Palungtar,
+Sahid.Lakhan,
+Siranchok,
+Sulikot,
+Chitawan.National.Park,
+Binayee.Tribeni,
+Bulingtar,
+Bungdikali,
+Devchuli,
+Gaidakot,
+Hupsekot,
+Kawasoti,
+Madhyabindu)
+
+
+
+
+
+tempMin_1950_2022_gandaki_municipality <- tempMin_1950_2022_municipality %>% 
+  select(year, month, day,
+Besishahar,
+Dordi,
+Dudhpokhari,
+Kwholasothar,
+MadhyaNepal,
+Marsyangdi,
+Rainas,
+Sundarbazar,
+Anbukhaireni,
+Bandipur,
+Bhanu,
+Bhimad,
+Byas,
+Devghat,
+Ghiring,
+Myagde,
+Rhishing,
+Shuklagandaki,
+Aandhikhola,
+Arjunchaupari,
+Bhirkot,
+Biruwa,
+Chapakot,
+Galyang,
+Harinas,
+Kaligandagi,
+Phedikhola,
+Putalibazar,
+Waling,
+Annapurna,
+Machhapuchchhre,
+Madi,
+Pokhara.Lekhnath,
+Rupa,
+Chame,
+Narphu,
+Nashong,
+Neshyang,
+Barhagaun.Muktikhsetra,
+Dalome,
+Gharapjhong,
+Lomanthang,
+Thasang,
+Beni,
+Dhaulagiri,
+Malika,
+Mangala,
+Raghuganga,
+Dhorpatan.Hunting.Reserve,
+Bihadi,
+Jaljala,
+Kushma,
+Mahashila,
+Modi,
+Painyu,
+Phalebas,
+Badigad,
+Baglung,
+Bareng,
+Dhorpatan,
+Galkot,
+Jaimuni,
+Kanthekhola,
+Nisikhola,
+Taman.Khola,
+Tara.Khola,
+Aarughat,
+Ajirkot,
+Bhimsen,
+Chum.Nubri,
+Dharche,
+Gandaki,
+Gorkha,
+Palungtar,
+Sahid.Lakhan,
+Siranchok,
+Sulikot,
+Chitawan.National.Park,
+Binayee.Tribeni,
+Bulingtar,
+Bungdikali,
+Devchuli,
+Gaidakot,
+Hupsekot,
+Kawasoti,
+Madhyabindu)
+
+
+
+
+precTot_1950_2022_gandaki_municipality <- precTot_1950_2022_municipality %>% 
+  select(year, month, day,
+Besishahar,
+Dordi,
+Dudhpokhari,
+Kwholasothar,
+MadhyaNepal,
+Marsyangdi,
+Rainas,
+Sundarbazar,
+Anbukhaireni,
+Bandipur,
+Bhanu,
+Bhimad,
+Byas,
+Devghat,
+Ghiring,
+Myagde,
+Rhishing,
+Shuklagandaki,
+Aandhikhola,
+Arjunchaupari,
+Bhirkot,
+Biruwa,
+Chapakot,
+Galyang,
+Harinas,
+Kaligandagi,
+Phedikhola,
+Putalibazar,
+Waling,
+Annapurna,
+Machhapuchchhre,
+Madi,
+Pokhara.Lekhnath,
+Rupa,
+Chame,
+Narphu,
+Nashong,
+Neshyang,
+Barhagaun.Muktikhsetra,
+Dalome,
+Gharapjhong,
+Lomanthang,
+Thasang,
+Beni,
+Dhaulagiri,
+Malika,
+Mangala,
+Raghuganga,
+Dhorpatan.Hunting.Reserve,
+Bihadi,
+Jaljala,
+Kushma,
+Mahashila,
+Modi,
+Painyu,
+Phalebas,
+Badigad,
+Baglung,
+Bareng,
+Dhorpatan,
+Galkot,
+Jaimuni,
+Kanthekhola,
+Nisikhola,
+Taman.Khola,
+Tara.Khola,
+Aarughat,
+Ajirkot,
+Bhimsen,
+Chum.Nubri,
+Dharche,
+Gandaki,
+Gorkha,
+Palungtar,
+Sahid.Lakhan,
+Siranchok,
+Sulikot,
+Chitawan.National.Park,
+Binayee.Tribeni,
+Bulingtar,
+Bungdikali,
+Devchuli,
+Gaidakot,
+Hupsekot,
+Kawasoti,
+Madhyabindu)
+```
+
+
+
+
+# Calculate climate extremes of that municipalities [Step 2]
+
+# Load Libraries 
+
+```{r}
+library(tidyverse)
+library(climdex.pcic.ncdf)
+library(ncdf4)
+library(raster)
+library(reshape2)
+library(plyr)
+require(scales)
+library(climdex.pcic)
+library(Kendall)
+#library(ncdf)
+library(PCICt)
+library(dplyr)
+```
+
+
+# List of dailekh municpalities 
+
+```{r}
+#setwd("E:/GIIS/ERA5 Hourly Data/Gandaki province/Data/Climate extreme output(second)")
+
+# List of words
+words <- c("Besishahar",
+"Dordi",
+"Dudhpokhari",
+"Kwholasothar",
+"MadhyaNepal",
+"Marsyangdi",
+"Rainas",
+"Sundarbazar",
+"Anbukhaireni",
+"Bandipur",
+"Bhanu",
+"Bhimad",
+"Byas",
+"Devghat",
+"Ghiring",
+"Myagde",
+"Rhishing",
+"Shuklagandaki",
+"Aandhikhola",
+"Arjunchaupari",
+"Bhirkot",
+"Biruwa",
+"Chapakot",
+"Galyang",
+"Harinas",
+"Kaligandagi",
+"Phedikhola",
+"Putalibazar",
+"Waling",
+"Annapurna",
+"Machhapuchchhre",
+"Madi",
+"Pokhara.Lekhnath",
+"Rupa",
+"Chame",
+"Narphu",
+"Nashong",
+"Neshyang",
+"Barhagaun.Muktikhsetra",
+"Dalome",
+"Gharapjhong",
+"Lomanthang",
+"Thasang",
+"Beni",
+"Dhaulagiri",
+"Malika",
+"Mangala",
+"Raghuganga",
+"Dhorpatan.Hunting.Reserve",
+"Bihadi",
+"Jaljala",
+"Kushma",
+"Mahashila",
+"Modi",
+"Painyu",
+"Phalebas",
+"Badigad",
+"Baglung",
+"Bareng",
+"Dhorpatan",
+"Galkot",
+"Jaimuni",
+"Kanthekhola",
+"Nisikhola",
+"Taman.Khola",
+"Tara.Khola",
+"Aarughat",
+"Ajirkot",
+"Bhimsen",
+"Chum.Nubri",
+"Dharche",
+"Gandaki",
+"Gorkha",
+"Palungtar",
+"Sahid.Lakhan",
+"Siranchok",
+"Sulikot",
+"Chitawan.National.Park",
+"Binayee.Tribeni",
+"Bulingtar",
+"Bungdikali",
+"Devchuli",
+"Gaidakot",
+"Hupsekot",
+"Kawasoti",
+"Madhyabindu")
+
+# Create a directory to save CSV files
+if (!file.exists("output_csv")) {
+  dir.create("output_csv")
+}
+
+# Loop through each word and generate code
+for (word in words) {
+  
+  base.period.historic <- c(1991, 2020)
+    
+    # Arrange date accordingly. 
+    
+  data.sub <- tempMax_1950_2022_gandaki_municipality %>%
+      mutate(date = as.Date(paste(year, month, day, sep = "-"),
+                            "%Y-%m-%d")) 
+    
+  this.dates <- as.PCICt(as.POSIXct(data.sub$date, tz = "GMT"),
+                           cal = "gregorian")
+  
+  climdex.input <- climdexInput.raw(tmax=tempMax_1950_2022_gandaki_municipality[[word]],
+                                    tmin=tempMin_1950_2022_gandaki_municipality[[word]],
+                                    prec = precTot_1950_2022_gandaki_municipality[[word]],
+                                    tmax.dates = this.dates,
+                                    tmin.dates = this.dates,
+                                    prec.dates = this.dates,
+                                    base.range = base.period.historic,
+                                    n = 5,
+                                    northern.hemisphere = TRUE,
+                                    tavg = NULL, tavg.dates = NULL,
+                                    quantiles = NULL,
+                                    temp.qtiles = c(0.1, 0.9),
+                                    prec.qtiles = c(0.95, 0.99),
+                                    max.missing.days = c(annual = 40, monthly = 10),
+                                    min.base.data.fraction.present = 0.1)
+
+              # CALCULATE INDICES
+              ## ANNUAL INDICES
+              ice_days <- climdex.id(climdex.input)
+              frost_days <- climdex.fd(climdex.input)
+              cdd <- climdex.cdd(climdex.input)
+              cwd <- climdex.cwd(climdex.input)
+              r99p <- climdex.r99ptot(climdex.input)
+              r95p <- climdex.r95ptot(climdex.input)
+              wsdi <- climdex.wsdi(climdex.input)
+              csdi <- climdex.csdi(climdex.input)
+              sdii <- climdex.sdii(climdex.input)
+              gsl <- climdex.gsl(climdex.input)
+              r10mm <- climdex.r10mm(climdex.input)
+              r20mm <- climdex.r20mm(climdex.input)
+              prcptot <- climdex.prcptot(climdex.input)
+              
+              ## MONTHLY INDICES
+              tx10p <- climdex.tx10p(climdex.input)
+              tx90p <- climdex.tx90p(climdex.input)
+              tn90p <- climdex.tn90p(climdex.input)
+              txx <- climdex.txx(climdex.input)
+              txn <- climdex.txn(climdex.input)
+              tnn <- climdex.tnn(climdex.input)
+              tnx <- climdex.tnx(climdex.input)
+              dtr <- climdex.dtr(climdex.input)
+              rx1day <- climdex.rx1day(climdex.input)
+              rx5day <- climdex.rx5day(climdex.input)
+
+  ## MERGE INDICES
+  annual.indices <- data.frame(cbind(ice_days, frost_days, cdd, cwd, r99p,
+                                     r95p, wsdi, csdi, sdii, gsl, r10mm, r20mm,
+                                     prcptot)) %>% 
+    mutate(Municipality = word)
+
+  monthly.indices <- data.frame(cbind(tx10p, tx90p, tn90p, txx,
+                                      txn, tnn, tnx, dtr, rx1day, rx5day)) %>% 
+    mutate(Municipality = word)
+  
+  # Save the results as CSV files with word's name in the file
+  write.csv(annual.indices, file = paste0("output_csv/", word, "_annual_indices.csv"))
+  write.csv(monthly.indices, file = paste0("output_csv/", word, "_monthly_indices.csv"))
+}
+```
+
+
+# Merge Annual Indices and Monthly indices all together in dailkeh and sarlahi 
+
+```{r}
+
+# Set the working directory to the folder containing the CSV files.
+setwd("E:/GIIS/ERA5 Hourly Data/Gandaki province/Data/Climate extreme output(second)")
+
+# Get a list of all the CSV files in the working directory.
+csv_files <- list.files(pattern = "*_annual_indices.csv")
+
+# Read all the CSV files into a list of data frames.
+data_frames <- lapply(csv_files, read.csv)
+
+# Merge all the data frames in the list into a single data frame.
+merged_data_frame <- bind_rows(data_frames)
+
+# Save the merged data frame to a new CSV file.
+write.csv(merged_data_frame, "ANNUAL_MERGED_DATA.csv")
+
+```
+
+
+# Calculate slope and p value of that municpalitie [Step 3]
+
+```{r}
+
+gandaki_annual_indices <- read.csv("E:/GIIS/ERA5 Hourly Data/Gandaki province/Data/Climate extreme output(second)/ANNUAL_MERGED_DATA.csv")
+
+gandaki_monthly_indices <- read.csv("E:/GIIS/ERA5 Hourly Data/Gandaki province/Data/Climate extreme output(second)/MONTHLY_MERGED_DATA.csv")
+
+# Load the required packages
+library(trend)
+library(Kendall)
+
+# ANNUAL INDICES
+
+# Create an empty data frame to store the results
+results <- data.frame(Municipality = character(0), Index = character(0), Sensitivity_Slope = numeric(0), MK_P_Value = numeric(0))
+
+# List of climate indices
+climate_indices <- c(
+  "ice_days", "frost_days", "cdd", "cwd", "r99p", "r95p",
+  "wsdi", "csdi", "sdii", "gsl", "r10mm", "r20mm", "prcptot"
+)
+
+# Split the data frame by Municipality
+municipality_groups <- split(gandaki_annual_indices, gandaki_annual_indices$Municipality)
+
+# Loop through each municipality group
+for (municipality in names(municipality_groups)) {
+  municipality_data <- municipality_groups[[municipality]]
+  
+  # Loop through each climate index
+  for (index_name in climate_indices) {
+    # Extract the column data
+    ci_values <- municipality_data[[index_name]]
+    
+    # Calculate the sensitivity slope
+    sens_slope_result <- sens.slope(ci_values)
+    
+    # Calculate the Mann-Kendall p-value
+    mk_test_result <- mk.test(ci_values)
+    
+    # Store the results in the 'results' data frame
+    results <- rbind(results, data.frame(Municipality = municipality, Index = index_name, Sensitivity_Slope = sens_slope_result$estimates, MK_P_Value = mk_test_result$p.value))
+  }
+}
+
+# Print the results
+write.csv(results,  "E:/GIIS/ERA5 Hourly Data/Gandaki province/Data/Sens slope and p value(third)/gandaki_annual_slope_p.csv", row.names = FALSE)
+
+
+
+# MONTHLY INDICES
+
+# Create an empty data frame to store the results
+results <- data.frame(Municipality = character(0), Index = character(0), Sensitivity_Slope = numeric(0), MK_P_Value = numeric(0))
+
+# List of climate indices
+climate_indices <- c(
+  "tx10p","tx90p","tn90p","txx","txn","tnn","tnx","dtr","rx1day","rx5day")
+
+# Split the data frame by Municipality
+municipality_groups <- split(gandaki_monthly_indices, gandaki_monthly_indices$Municipality)
+
+# Loop through each municipality group
+for (municipality in names(municipality_groups)) {
+  municipality_data <- municipality_groups[[municipality]]
+  
+  # Loop through each climate index
+  for (index_name in climate_indices) {
+    # Extract the column data
+    ci_values <- municipality_data[[index_name]]
+    
+    # Calculate the sensitivity slope
+    sens_slope_result <- sens.slope(ci_values)
+    
+    # Calculate the Mann-Kendall p-value
+    mk_test_result <- mk.test(ci_values)
+    
+    # Store the results in the 'results' data frame
+    results <- rbind(results, data.frame(Municipality = municipality, Index = index_name, Sensitivity_Slope = sens_slope_result$estimates, MK_P_Value = mk_test_result$p.value))
+  }
+}
+
+# Print the results
+write.csv(results,  "E:/GIIS/ERA5 Hourly Data/Gandaki province/Data/Sens slope and p value(third)/gandaki_monthly_slope_p.csv", row.names = FALSE)
+
+
+
+```
+
+
